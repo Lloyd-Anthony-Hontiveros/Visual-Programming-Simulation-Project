@@ -1,18 +1,11 @@
-# hello_psg.py
+import tkinter as tk
 
-import PySimpleGUI as sg
 
-layout = [[sg.Text("Hello from PySimpleGUI")], [sg.Button("OK")]]
+root = tk.Tk()
 
-# Create the window
-window = sg.Window("Demo", layout)
+# place a label on the root window
+message = tk.Label(root, text="Hello, World!")
+message.pack()
 
-# Create an event loop
-while True:
-    event, values = window.read()
-    # End program if user closes window or
-    # presses the OK button
-    if event == "OK" or event == sg.WIN_CLOSED:
-        break
-
-window.close()
+# keep the window displaying
+root.mainloop()
