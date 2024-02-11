@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
+import matplotlib.pyplot as plt
+import numpy as np
 
 root = tk.Tk()
 root.title("Evaluation Metrics Simulation") #Title of Main Program
@@ -44,7 +46,19 @@ datamodel_label.grid(column=0, row=2, sticky=tk.W, padx=5, pady=5)
 datamodels.grid(column=0, row=4, sticky=tk.W, padx=5, pady=5)
 
 evalmetrics_label = tk.Label(root, text="Evaluation Metrics")
-evalmetrics_label.grid(column=0, row=5, sticky=tk.W, padx=5, pady=5)
+evalmetrics_label.grid(column=0, row=6, sticky=tk.W, padx=5, pady=5)
+
+dataset_name_var = "Example Dataset"
+dataset_name = tk.Label(root, text=f"Dataset Title: {dataset_name_var}")
+dataset_name.grid(column=1, row=1, sticky=tk.W, padx=5, pady=5)
+
+dataset_type_var = "Example Target Type" #Some function to determine Target type here
+dataset_type = tk.Label(root, text=f"Dataset Type: {dataset_type_var}")
+dataset_type.grid(column=1, row=2, sticky=tk.W, padx=5, pady=5)
+
+datamodel_name_var = "Example Data Model"
+datamodel_name = tk.Label(root, text=f"Data Model Used: {datamodel_name_var}")
+datamodel_name.grid(column=1, row=3, sticky=tk.W, padx=5, pady=5)
 
 # keep the window displaying
 root.mainloop()
