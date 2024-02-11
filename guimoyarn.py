@@ -79,22 +79,27 @@ def calculate_metrics():
 
     datamodel_name_var = datamodels.get()
 
+    # Update labels for dataset title and data model used
+    dataset_title_label.config(text=f"Dataset Title: {dataset_name_var}")
+    datamodel_used_label.config(text=f"Data Model Used: {datamodel_name_var}")
+
     # Sample evaluation metrics
     y_true = dataset.target
     y_pred = np.random.randint(0, high=np.max(y_true), size=len(y_true))
+
 
     if problem_type == 'classification':
         accuracy = accuracy_score(y_true, y_pred)
         precision = precision_score(y_true, y_pred, average='weighted', zero_division=1)
         recall = recall_score(y_true, y_pred, average='weighted')
         f1 = f1_score(y_true, y_pred, average='weighted')
-        
+
         # Update labels for classification metrics
         accuracy_label.config(text=f"Accuracy: {accuracy:.2f}")
         precision_label.config(text=f"Precision: {precision:.2f}")
         recall_label.config(text=f"Recall: {recall:.2f}")
         f1_label.config(text=f"F1 Score: {f1:.2f}")
-        
+
         # Clear labels for regression metrics
         mse_label.config(text="")
         r2_label.config(text="")
@@ -116,6 +121,15 @@ def calculate_metrics():
 # Button to calculate metrics
 calculate_button = ttk.Button(root, text="Calculate Metrics", command=calculate_metrics)
 calculate_button.grid(column=0, row=7, sticky=tk.W, padx=5, pady=5)
+
+# Define the label for dataset title
+dataset_title_label = tk.Label(root, text="")
+dataset_title_label.grid(column=0, row=8, sticky=tk.W, padx=5, pady=5)
+
+# Define the label for data model used
+datamodel_used_label = tk.Label(root, text="")
+datamodel_used_label.grid(column=0, row=9, sticky=tk.W, padx=5, pady=5)
+
 
 # Labels for displaying classification metrics
 accuracy_label = tk.Label(root, text="Accuracy: ")
