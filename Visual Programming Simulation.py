@@ -27,7 +27,7 @@ datasets.set('Dataset 1')
     #Data Model Combo Box
 datamodel_string = tk.StringVar()
 datamodels = ttk.Combobox(root, textvar=datamodel_string)
-datamodels['values'] = ('Data Model 1', 'Data Model 2', 'Data Model 3')
+datamodels['values'] = ('Data Model 1', 'Data Model 2', 'Data Model 3', 'Data Model 4')
 datamodels['state'] = 'readonly'
 # datamodels.bind('<<ComboboxSelected>>', callback)
 datamodels.set('Data Model 1')
@@ -35,6 +35,8 @@ datamodels.set('Data Model 1')
     #Grid Config
 root.columnconfigure(0, weight=2)
 root.columnconfigure(1, weight=1)
+
+root.rowconfigure(7, weight=4)
 
     # Actual Screen Content
 dataset_label = tk.Label(root, text="Pick a sample Dataset:")
@@ -47,6 +49,7 @@ datamodels.grid(column=0, row=4, sticky=tk.W, padx=5, pady=5)
 
 evalmetrics_label = tk.Label(root, text="Evaluation Metrics")
 evalmetrics_label.grid(column=0, row=6, sticky=tk.W, padx=5, pady=5)
+
 
 dataset_name_var = "Example Dataset"
 dataset_name = tk.Label(root, text=f"Dataset Title: {dataset_name_var}")
