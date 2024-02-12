@@ -27,14 +27,14 @@ test_data = {
 languages = test_data.keys()
 popularity = test_data.values()
 
-figure = Figure(figsize=(4, 3), dpi=100)
+figure = Figure(figsize=(4, 4.5), dpi=100)
 figure_canvas = FigureCanvasTkAgg(figure, root)
 
 axes = figure.add_subplot()
 axes.bar(languages, popularity)
 axes.set_title('Top 5 Programming Languages')
 axes.set_ylabel('Popularity')
-figure_canvas.get_tk_widget().grid(column=2,row=4, sticky=tk.W, padx=5, pady=5, rowspan=10, columnspan=1)
+figure_canvas.get_tk_widget().grid(column=2,row=4, sticky=tk.W, padx=5, pady=5, rowspan=25, columnspan=1)
 
 #Center the Program to Screen when opened
 screen_width = root.winfo_screenwidth()
@@ -61,8 +61,6 @@ datamodels['state'] = 'readonly'
 datamodels.set('Logistic Regression')
 
     #Grid Config
-root.columnconfigure(0, weight=1)
-root.columnconfigure(1, weight=1)
 root.columnconfigure(2, weight=2)
 
     # Actual Screen Content
@@ -156,12 +154,36 @@ recall_label.grid(column=0, row=10, sticky=tk.W, padx=5, pady=5)
 f1_label = tk.Label(root, text="F1 Score: ")
 f1_label.grid(column=0, row=11, sticky=tk.W, padx=5, pady=5)
 
+auc_label = tk.Label(root, text=f"Area Under ROC: ")
+auc_label.grid(column=1, row=8, sticky=tk.W, padx=5, pady=5)
+
+auc_label = tk.Label(root, text="number")
+auc_label.grid(column=1, row=9, sticky=tk.W, padx=5, pady=5)
+
+mcc_label = tk.Label(root, text="Matthews Correlation Coefficient: ")
+mcc_label.grid(column=1, row=10, sticky=tk.W, padx=5, pady=5)
+
+mcc_value_label = tk.Label(root, text="number")
+mcc_value_label.grid(column=1, row=11, sticky=tk.W, padx=5, pady=5)
+
 # Labels for displaying regression metrics
+mae_label = tk.Label(root, text="Mean Absolute Error: ")
+mae_label.grid(column=0, row=8, sticky=tk.W, padx=5, pady=5)
+
 mse_label = tk.Label(root, text="Mean Squared Error: ")
-mse_label.grid(column=0, row=8, sticky=tk.W, padx=5, pady=5)
+mse_label.grid(column=0, row=9, sticky=tk.W, padx=5, pady=5)
+
+rmse_label= tk.Label(root, text="Root Mean Squared Error: ")
+rmse_label.grid(column=0, row=10, sticky=tk.W, padx=5, pady=5)
+
+rmsle_label = tk.Label(root, text=f"Root Mean Squared Logarithmic Error: ")
+rmsle_label.grid(column=0, row=11, sticky=tk.W, padx=5, pady=5)
+
+rmsle_value_label = tk.Label(root, text="Number")
+rmsle_value_label.grid(column=0, row=12, sticky=tk.W, padx=5, pady=5)
 
 r2_label = tk.Label(root, text="R2 Score: ")
-r2_label.grid(column=0, row=9, sticky=tk.W, padx=5, pady=5)
+r2_label.grid(column=1, row=8, sticky=tk.W, padx=5, pady=5)
 
 dataset_name_var = "Example Dataset"
 dataset_name = tk.Label(root, text=f"Dataset Title: {dataset_name_var}")
