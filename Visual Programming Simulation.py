@@ -1,13 +1,40 @@
 import tkinter as tk
 from tkinter import ttk
-import matplotlib.pyplot as plt
+import matplotlib
 import numpy as np
 from sklearn import datasets
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.metrics import mean_squared_error, r2_score
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (
+    FigureCanvasTkAgg,
+    NavigationToolbar2Tk
+)
 
 root = tk.Tk()
 root.title("Evaluation Metrics Simulation") #Title of Main Program
+
+# Graph Template
+matplotlib.use("TkAgg")
+
+test_data = {
+    'Python': 11.27,
+    'C': 11.16,
+    'Java': 10.46,
+    'C++': 7.5,
+    'C#': 5.26
+}
+languages = test_data.keys()
+popularity = test_data.values()
+
+figure = Figure(figsize=(4, 3), dpi=100)
+figure_canvas = FigureCanvasTkAgg(figure, root)
+
+axes = figure.add_subplot()
+axes.bar(languages, popularity)
+axes.set_title('Top 5 Programming Languages')
+axes.set_ylabel('Popularity')
+figure_canvas.get_tk_widget().grid(column=2,row=4, sticky=tk.W, padx=5, pady=5, rowspan=10, columnspan=1)
 
 #Center the Program to Screen when opened
 screen_width = root.winfo_screenwidth()
@@ -36,17 +63,16 @@ datamodels.set('Logistic Regression')
     #Grid Config
 root.columnconfigure(0, weight=1)
 root.columnconfigure(1, weight=1)
-root.columnconfigure(2, weight=1)
-root.columnconfigure(3, weight=1)
+root.columnconfigure(2, weight=2)
 
     # Actual Screen Content
 dataset_label = tk.Label(root, text="Pick a sample Dataset:")
 dataset_label.grid(column=0, row=0, sticky=tk.W, padx=5, pady=5)
-datasets_combo.grid(column=0, row=1, sticky=tk.W, padx=5, pady=5)
+datasets_combo.grid(column=0, row=1, sticky=tk.W, padx=5, pady=5, columnspan=2)
 
 datamodel_label = tk.Label(root, text="Pick a sample Data Model:")
 datamodel_label.grid(column=0, row=2, sticky=tk.W, padx=5, pady=5)
-datamodels.grid(column=0, row=3, sticky=tk.W, padx=5, pady=5)
+datamodels.grid(column=0, row=3, sticky=tk.W, padx=5, pady=5, columnspan=2)
 
 def load_dataset(dataset_name):
     if dataset_name == 'Iris':
@@ -75,7 +101,8 @@ def calculate_metrics():
 
     # Sample evaluation metrics
     y_true = dataset.target
-    y_pred = np.random.randint(0, high=np.max(y_true), size=len(y_true))
+
+    #TODO: Prediction Codes
 
     if dataset_type_var == 'Classification':
         accuracy = accuracy_score(y_true, y_pred)
@@ -138,15 +165,15 @@ r2_label.grid(column=0, row=9, sticky=tk.W, padx=5, pady=5)
 
 dataset_name_var = "Example Dataset"
 dataset_name = tk.Label(root, text=f"Dataset Title: {dataset_name_var}")
-dataset_name.grid(column=1, row=1, sticky=tk.W, padx=5, pady=5)
+dataset_name.grid(column=2, row=1, sticky=tk.W, padx=5, pady=5)
 
 dataset_type_var = "Example Target Type" #Some function to determine Target type here
 dataset_type = tk.Label(root, text=f"Dataset Type: {dataset_type_var}")
-dataset_type.grid(column=1, row=2, sticky=tk.W, padx=5, pady=5)
+dataset_type.grid(column=2, row=2, sticky=tk.W, padx=5, pady=5)
 
 datamodel_name_var = "Example Data Model"
 datamodel_name = tk.Label(root, text=f"Data Model Used: {datamodel_name_var}")
-datamodel_name.grid(column=1, row=3, sticky=tk.W, padx=5, pady=5)
+datamodel_name.grid(column=2, row=3, sticky=tk.W, padx=5, pady=5)
 
 # keep the window displaying
 root.mainloop()
