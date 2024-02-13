@@ -38,7 +38,7 @@ axes = figure.add_subplot()
 axes.bar(languages, popularity)
 axes.set_title('Top 5 Programming Languages')
 axes.set_ylabel('Popularity')
-figure_canvas.get_tk_widget().grid(column=2,row=4, sticky=tk.W, padx=5, pady=5, rowspan=25, columnspan=1)
+figure_canvas.get_tk_widget().grid(column=2,row=0, sticky=tk.W, padx=5, pady=5, rowspan=25, columnspan=1)
 
 #Center the Program to Screen when opened
 screen_width = root.winfo_screenwidth()
@@ -47,7 +47,7 @@ screen_height = root.winfo_screenheight()
 center_x = int(screen_width/2 - 800 / 2)
 center_y = int(screen_height/2 - 600 / 2)
 
-root.geometry(f'800x600+{center_x}+{center_y}')
+root.geometry(f'800x500+{center_x}+{center_y}')
 root.resizable(False, False)
 
     #Dataset Combo Box
@@ -209,40 +209,40 @@ f1_label = tk.Label(root, text=f"F1 Score: ")
 f1_label.grid(column=1, row=9, padx=5, pady=5)
 
 mcc_label = tk.Label(root, text=f"Matthews Correlation Coefficient: ")
-mcc_label.grid(column=0, row=10, padx=5, pady=5)
+mcc_label.grid(column=0, row=10, padx=5, pady=5, columnspan=2)
 
 # Labels for displaying regression metrics, starts out Invisible
 mae_label = tk.Label(root, text="")
-mae_label.grid(column=0, row=8, padx=5, pady=5)
+mae_label.grid(column=0, row=8, padx=5, pady=5, columnspan=2)
 mae_label.grid_remove()
 
 mse_label = tk.Label(root, text="")
-mse_label.grid(column=0, row=9, padx=5, pady=5)
+mse_label.grid(column=0, row=9, padx=5, pady=5, columnspan=2)
 mse_label.grid_remove()
 
 rmse_label = tk.Label(root, text="")
-rmse_label.grid(column=0, row=10, padx=5, pady=5)
+rmse_label.grid(column=0, row=10, padx=5, pady=5, columnspan=2)
 rmse_label.grid_remove()
 
 mpe_label = tk.Label(root, text="")
-mpe_label.grid(column=0, row=11, padx=5, pady=5)
+mpe_label.grid(column=0, row=11, padx=5, pady=5, columnspan=2)
 mpe_label.grid_remove()
 
 r2_label = tk.Label(root, text="")
-r2_label.grid(column=1, row=8, padx=5, pady=5)
+r2_label.grid(column=0, row=12, padx=5, pady=5, columnspan=2)
 r2_label.grid_remove()
 
 dataset_name_var = "Breast Cancer"
 dataset_name = tk.Label(root, text=f"Dataset Title: {dataset_name_var}")
-dataset_name.grid(column=2, row=1, sticky=tk.W, padx=5, pady=5)
+dataset_name.grid(column=1, row=1, sticky=tk.EW, padx=5, pady=5)
 
 dataset_type_var = "Classification" #Some function to determine Target type here
 dataset_type = tk.Label(root, text=f"Dataset Type: {dataset_type_var}")
-dataset_type.grid(column=2, row=2, sticky=tk.W, padx=5, pady=5)
+dataset_type.grid(column=1, row=2, sticky=tk.EW, padx=5, pady=5)
 
 datamodel_name_var = "Naive Bayes"
 datamodel_name = tk.Label(root, text=f"Data Model Used: {datamodel_name_var}")
-datamodel_name.grid(column=2, row=3, sticky=tk.W, padx=5, pady=5)
+datamodel_name.grid(column=1, row=3, sticky=tk.EW, padx=5, pady=5)
 
 # keep the window displaying
 root.mainloop()
