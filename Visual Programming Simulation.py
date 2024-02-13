@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import datasets
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, matthews_corrcoef
@@ -18,28 +19,6 @@ from sklearn import linear_model as lm
 root = tk.Tk()
 root.title("Evaluation Metrics Simulation") #Title of Main Program
 
-# Graph Template
-matplotlib.use("TkAgg")
-
-test_data = {
-    'Python': 11.27,
-    'C': 11.16,
-    'Java': 10.46,
-    'C++': 7.5,
-    'C#': 5.26
-}
-languages = test_data.keys()
-popularity = test_data.values()
-
-figure = Figure(figsize=(4, 4.5), dpi=100)
-figure_canvas = FigureCanvasTkAgg(figure, root)
-
-axes = figure.add_subplot()
-axes.bar(languages, popularity)
-axes.set_title('Top 5 Programming Languages')
-axes.set_ylabel('Popularity')
-figure_canvas.get_tk_widget().grid(column=2,row=0, sticky=tk.W, padx=5, pady=5, rowspan=25, columnspan=1)
-
 #Center the Program to Screen when opened
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
@@ -49,6 +28,11 @@ center_y = int(screen_height/2 - 600 / 2)
 
 root.geometry(f'800x500+{center_x}+{center_y}')
 root.resizable(False, False)
+
+matplotlib.use("TkAgg")
+
+figure = Figure(figsize=(4, 4.5), dpi=100)
+figure_canvas = FigureCanvasTkAgg(figure, root)
 
     #Dataset Combo Box
 dataset_string = tk.StringVar()
@@ -76,16 +60,44 @@ datamodel_label = tk.Label(root, text="Pick a sample Data Model:")
 datamodel_label.grid(column=0, row=2, sticky=tk.W, padx=5, pady=5)
 datamodels.grid(column=0, row=3, sticky=tk.W, padx=5, pady=5, columnspan=2)
 
+def generate_graph(dataset, data_model):
+
+    if (data_model == "Decision Tree"):
+        X = dataset.data
+        y = dataset.target
+        model = tree.DecisionTreeClassifier()
+        model.fit(X, y)
+        axes = figure.add_subplot()
+        tree.plot_tree(model, filled=True, feature_names=dataset.feature_names, class_names=dataset.target_names)
+        axes.set_title('Decision Tree Visualization')
+    elif (data_model == "Linear Regression"):
+
+        X = dataset.data[:, np.newaxis, 2]
+        y = dataset.target
+
+        model = lm.LinearRegression()
+        model.fit(X, y)
+
+        axes = figure.add_subplot()
+        plt.scatter(X, y, color='black')
+        plt.plot(X, model.predict(X), color='blue', linewidth=3)
+        axes.set_title('Linear Regression')
+        axes.set_ylabel('Target')
+        axes.set_xlabel('Feature')
+
+    figure_canvas.get_tk_widget().grid(column=2,row=0, padx=5, pady=5, rowspan=25, columnspan=1)
+
 def load_dataset(dataset_name):
     if dataset_name == 'Breast Cancer':
-        return datasets.load_breast_cancer(return_X_y=True), 'Classification'
+        return datasets.load_breast_cancer(), 'Classification'
     elif dataset_name == 'Diabetes':
-        return datasets.load_diabetes(return_X_y=True), 'Regression'
+        return datasets.load_diabetes(), 'Regression'
     else:
         return None, None
 
 def train_test_model(data_model, dataset, target):
-    X, y = dataset
+    X = dataset.data
+    y = dataset.target
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0, test_size=0.20, train_size=0.80)
     if (data_model == "Naive Bayes"):
         nbayes = GaussianNB().fit(X_train, y_train)
@@ -99,6 +111,7 @@ def train_test_model(data_model, dataset, target):
             return svectorreg.predict(X_test), y_test
     elif (data_model == "Decision Tree"):
         treemodel = tree.DecisionTreeRegressor(random_state=0).fit(X_train,y_train)
+        generate_graph(dataset, data_model)
         return treemodel.predict(X_test), y_test
     elif (data_model == "Neural Network"):
         if(target == "Classification"):
@@ -112,6 +125,7 @@ def train_test_model(data_model, dataset, target):
         return logreg.predict(X_test), y_test
     elif (data_model == "Linear Regression"):
         linreg = lm.LinearRegression().fit(X_train, y_train)
+        generate_graph(dataset, data_model)
         return linreg.predict(X_test), y_test
     else:
         return None, None
@@ -129,10 +143,8 @@ def calculate_metrics():
     datamodel_name.config(text=f"Data Model Used: {datamodel_name_var}")
     dataset_type.config(text=f"Dataset Type: {dataset_type_var}")
 
-    # Sample evaluation metrics
+    # Eval Functions
     y_pred, y_true = train_test_model(datamodel_name_var, dataset, dataset_type_var)
-
-    #TODO: Prediction Codes
 
     if dataset_type_var == 'Classification':
         accuracy = accuracy_score(y_true, y_pred)
@@ -193,7 +205,10 @@ calculate_button.grid(column=0, row=4, padx=5, pady=5)
 tk.Label(root, text="").grid(column=0, row=5, padx=5, pady=5)
 
 evalmetrics_label = tk.Label(root, text="Evaluation Metrics")
-evalmetrics_label.grid(column=0, row=6, padx=5, pady=5)
+evalmetrics_label.grid(column=0, row=6, padx=5, pady=5, columnspan=2)
+
+error_msg_label = tk.Label(root, text="Error: Invalid Data Model for Dataset")
+error_msg_label.grid(column=0, row=7, padx=5, pady=5, columnspan=2)
 
 # Labels for displaying classification metrics
 accuracy_label = tk.Label(root, text=f"Accuracy: ")
