@@ -77,7 +77,7 @@ def calculate_metrics():
         rmse_label.config(text="")
         mae_label.config(text="")
         r2_label.config(text="")
-        
+
         # Display data visualization for decision tree
         plot_decision_tree(dataset)
 
@@ -96,7 +96,7 @@ def calculate_metrics():
         rmse_label.config(text=f"Root Mean Squared Error: {rmse:.2f}")
         mae_label.config(text=f"Mean Absolute Error: {mae:.2f}")
         r2_label.config(text=f"R2 Score: {r2:.2f}")
-        
+
         # Display data visualization for linear regression
         plot_linear_regression(dataset)
 
