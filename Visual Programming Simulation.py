@@ -11,7 +11,7 @@ from matplotlib.backends.backend_tkagg import (
     NavigationToolbar2Tk
 )
 from sklearn.model_selection import train_test_split
-from sklearn import linear_model, tree
+from sklearn import tree, neural_network, svm
 from sklearn.naive_bayes import GaussianNB
 
 root = tk.Tk()
@@ -59,7 +59,7 @@ datasets_combo.set('Iris')
     #Data Model Combo Box
 datamodel_string = tk.StringVar()
 datamodels = ttk.Combobox(root, textvar=datamodel_string)
-datamodels['values'] = ('Logistic Regression', 'Decision Tree', 'Linear Regression', 'Naive Bayes')
+datamodels['values'] = ('Naive Bayes', 'SVM', 'Decision Tree', 'Neural Network')
 datamodels['state'] = 'readonly'
 datamodels.set('Logistic Regression')
 
@@ -87,18 +87,31 @@ def load_dataset(dataset_name):
     else:
         return None, None
 
-def train_test_model(data_model, dataset):
+def train_test_model(data_model, dataset, target):
     X, y = dataset
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0, test_size=0.20, train_size=0.80)
-    if (data_model == "Logistic Regression"):
-        logmodel = linear_model.LogisticRegression(random_state=0).fit(X_train,y_train)
-        return logmodel.predict(X_test), y_test
+    if (data_model == "Naive Bayes"):
+        nbayes = GaussianNB().fit(X_train, y_train)
+        return nbayes.predict(X_test), y_test
+    elif (data_model == "SVM"):
+        if(target == "Classification"):
+            svectorclass = svm.SVC().fit(X_train, y_train)
+            return svectorclass.predict(X_test), y_test
+        elif(target == "Regression"):
+            svectorreg = svm.SVR().fit(X_train, y_train)
+            return svectorreg.predict(X_test), y_test
     elif (data_model == "Decision Tree"):
         treemodel = tree.DecisionTreeRegressor(random_state=0).fit(X_train,y_train)
         return treemodel.predict(X_test), y_test
-    elif (data_model == "Linear Regression"):
-        linmodel = linear_model.LinearRegression(random_state=0).fit(X_train,y_train)
-        return linmodel.predict(X_test), y_test
+    elif (data_model == "Neural Network"):
+        if(target == "Classification"):
+            pony_classifier = neural_network.MLPClassifier().fit(X_train,y_train)
+            return pony_classifier.predict(X_test), y_test
+        elif(target == "Regression"):
+            pony_regressor = neural_network.MLPRegressor().fit(X_train, y_train)
+            return pony_regressor.predict(X_test), y_test
+    else:
+        return None, None
 
 def calculate_metrics():
     dataset_name_var = dataset_string.get()
@@ -114,7 +127,7 @@ def calculate_metrics():
     dataset_type.config(text=f"Dataset Type: {dataset_type_var}")
 
     # Sample evaluation metrics
-    y_pred, y_true = train_test_model(datamodel_name_var, dataset)
+    y_pred, y_true = train_test_model(datamodel_name_var, dataset, dataset_type_var)
 
     #TODO: Prediction Codes
 
@@ -123,7 +136,7 @@ def calculate_metrics():
         precision = precision_score(y_true, y_pred, average='weighted', zero_division=1)
         recall = recall_score(y_true, y_pred, average='weighted')
         f1 = f1_score(y_true, y_pred, average='weighted')
-        auc = roc_auc_score(y_true, y_pred, multi_class="ovr")
+        auc = np.round(roc_auc_score(y_true, y_pred, multi_class="ovr", average="weighted"), 3)
         mcc = matthews_corrcoef(y_true, y_pred, average='weighted')
 
         # Update labels for classification metrics
@@ -146,7 +159,7 @@ def calculate_metrics():
         mae = mean_absolute_error(y_true, y_pred)
         mse = mean_squared_error(y_true, y_pred)
         rmse = mean_squared_error(y_true, y_pred, squared=False)
-        rmsle = mean_squared_log_error(y_true, y_pred, squared=False)
+        mpe = mean_absolute_percentage_error(y_true, y_pred)
         r2 = r2_score(y_true, y_pred)
 
         # Clear labels for classification metrics
@@ -155,6 +168,7 @@ def calculate_metrics():
         recall_label.config(text="")
         f1_label.config(text="")
         auc_label.config(text="")
+        auc_val_label.config(text="")
         mcc_label.config(text="")
         mcc_value_label.config(text="")
 
@@ -162,8 +176,7 @@ def calculate_metrics():
         mae_label.config(text=f"Mean Absolute Error: {mae:.2f}")
         mse_label.config(text=f"Mean Squared Error: {mse:.2f}")
         rmse_label.config(text=f"Root Mean Squared Error: {rmse:.2f}")
-        rmsle_label.config(text=f"Root Mean Squared Logarithmic Error: ")
-        rmsle_value_label.config(text=f"{rmsle}")
+        mpe_label.config(text=f"Mean Absolute Percentage Error: {mpe:.2f}")
         r2_label.config(text=f"R2 Score: {r2:.2f}")
 
 # Button to calculate metrics
@@ -191,8 +204,8 @@ f1_label.grid(column=0, row=11, sticky=tk.W, padx=5, pady=5)
 auc_label = tk.Label(root, text=f"Area Under ROC: ")
 auc_label.grid(column=1, row=8, sticky=tk.W, padx=5, pady=5)
 
-auc_label = tk.Label(root, text="number")
-auc_label.grid(column=1, row=9, sticky=tk.W, padx=5, pady=5)
+auc_val_label = tk.Label(root, text="number")
+auc_val_label.grid(column=1, row=9, sticky=tk.W, padx=5, pady=5)
 
 mcc_label = tk.Label(root, text="Matthews Correlation Coefficient: ")
 mcc_label.grid(column=1, row=10, sticky=tk.W, padx=5, pady=5)
@@ -207,14 +220,11 @@ mae_label.grid(column=0, row=8, sticky=tk.W, padx=5, pady=5)
 mse_label = tk.Label(root, text="Mean Squared Error: ")
 mse_label.grid(column=0, row=9, sticky=tk.W, padx=5, pady=5)
 
-rmse_label= tk.Label(root, text="Root Mean Squared Error: ")
+rmse_label = tk.Label(root, text="Root Mean Squared Error: ")
 rmse_label.grid(column=0, row=10, sticky=tk.W, padx=5, pady=5)
 
-rmsle_label = tk.Label(root, text=f"Root Mean Squared Logarithmic Error: ")
-rmsle_label.grid(column=0, row=11, sticky=tk.W, padx=5, pady=5)
-
-rmsle_value_label = tk.Label(root, text="Number")
-rmsle_value_label.grid(column=0, row=12, sticky=tk.W, padx=5, pady=5)
+mpe_label = tk.Label(root, text="Mean Squared Percentage Error: ")
+mpe_label.grid(column=0, row=11, sticky=tk.W, padx=5, pady=5)
 
 r2_label = tk.Label(root, text="R2 Score: ")
 r2_label.grid(column=1, row=8, sticky=tk.W, padx=5, pady=5)
