@@ -109,8 +109,11 @@ def train_test_model(data_model, dataset, target):
             return svectorreg.predict(X_test), y_test
     elif (data_model == "Decision Tree"):
         treemodel = tree.DecisionTreeRegressor(random_state=0).fit(X_train,y_train)
-        generate_graph(dataset, data_model)
-        error_msg_label.config(text=f"")
+        if (target == "Classification"):
+            generate_graph(dataset, data_model)
+            error_msg_label.config(text=f"")
+        elif (target == "Regression"):
+            error_msg_label.config(text="Error: Unable to Generate Graph for Regression Dataset")
         return treemodel.predict(X_test), y_test
     elif (data_model == "Neural Network"):
         if(target == "Classification"):
@@ -123,14 +126,14 @@ def train_test_model(data_model, dataset, target):
             return pony_regressor.predict(X_test), y_test
     elif (data_model == "Logistic Regression"):
         if (target == "Regression"):
-            error_msg_label.config(text=f"{error_msg}")
+            error_msg_label.config(text="Error: Invalid Data Model for Dataset")
         else:
             logreg = lm.LogisticRegression(random_state=0).fit(X_train, y_train)
             error_msg_label.config(text=f"")
             return logreg.predict(X_test), y_test
     elif (data_model == "Linear Regression"):
         if (target == "Classification"):
-            error_msg_label.config(text=f"{error_msg}")
+            error_msg_label.config(text="Error: Invalid Data Model for Dataset")
         else:
             linreg = lm.LinearRegression().fit(X_train, y_train)
             generate_graph(dataset, data_model)
