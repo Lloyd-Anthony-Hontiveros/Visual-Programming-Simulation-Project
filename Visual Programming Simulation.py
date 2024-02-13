@@ -3,8 +3,8 @@ from tkinter import ttk
 import matplotlib
 import numpy as np
 from sklearn import datasets
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, matthews_corrcoef
-from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error, mean_squared_error, mean_squared_log_error, r2_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, matthews_corrcoef
+from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error, mean_squared_error, r2_score
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg,
@@ -13,6 +13,7 @@ from matplotlib.backends.backend_tkagg import (
 from sklearn.model_selection import train_test_split
 from sklearn import tree, neural_network, svm
 from sklearn.naive_bayes import GaussianNB
+from sklearn import linear_model as lm
 
 root = tk.Tk()
 root.title("Evaluation Metrics Simulation") #Title of Main Program
@@ -52,14 +53,14 @@ root.resizable(False, False)
     #Dataset Combo Box
 dataset_string = tk.StringVar()
 datasets_combo = ttk.Combobox(root, textvar=dataset_string)
-datasets_combo['values'] = ('Breast Cancer', 'Wine (WIP)', 'Diabetes', 'California Housing')
+datasets_combo['values'] = ('Breast Cancer', 'Diabetes')
 datasets_combo['state'] = 'readonly'
 datasets_combo.set('Breast Cancer')
 
     #Data Model Combo Box
 datamodel_string = tk.StringVar()
 datamodels = ttk.Combobox(root, textvar=datamodel_string)
-datamodels['values'] = ('Naive Bayes', 'SVM', 'Decision Tree', 'Neural Network')
+datamodels['values'] = ('Naive Bayes', 'SVM', 'Decision Tree', 'Neural Network', "Logistic Regression", "Linear Regression")
 datamodels['state'] = 'readonly'
 datamodels.set('Naive Bayes')
 
@@ -78,12 +79,8 @@ datamodels.grid(column=0, row=3, sticky=tk.W, padx=5, pady=5, columnspan=2)
 def load_dataset(dataset_name):
     if dataset_name == 'Breast Cancer':
         return datasets.load_breast_cancer(return_X_y=True), 'Classification'
-    elif dataset_name == 'Wine (WIP)':
-        return datasets.load_wine(return_X_y=True), 'Classification'
     elif dataset_name == 'Diabetes':
         return datasets.load_diabetes(return_X_y=True), 'Regression'
-    elif dataset_name == 'California Housing':
-        return datasets.fetch_california_housing(return_X_y=True), 'Regression'
     else:
         return None, None
 
@@ -110,6 +107,12 @@ def train_test_model(data_model, dataset, target):
         elif(target == "Regression"):
             pony_regressor = neural_network.MLPRegressor().fit(X_train, y_train)
             return pony_regressor.predict(X_test), y_test
+    elif (data_model == "Logistic Regression"):
+        logreg = lm.LogisticRegression(random_state=0).fit(X_train, y_train)
+        return logreg.predict(X_test), y_test
+    elif (data_model == "Linear Regression"):
+        linreg = lm.LinearRegression().fit(X_train, y_train)
+        return linreg.predict(X_test), y_test
     else:
         return None, None
 
@@ -136,7 +139,6 @@ def calculate_metrics():
         precision = precision_score(y_true, y_pred, average='weighted', zero_division=1)
         recall = recall_score(y_true, y_pred, average='weighted')
         f1 = f1_score(y_true, y_pred, average='weighted')
-        auc = roc_auc_score(y_true, y_pred, multi_class="ovo", average="weighted")
         mcc = matthews_corrcoef(y_true, y_pred)
 
         # Update labels for classification metrics
@@ -144,13 +146,11 @@ def calculate_metrics():
         precision_label.grid()
         recall_label.grid()
         f1_label.grid()
-        auc_label.grid()
         mcc_label.grid()
         accuracy_label.config(text=f"Accuracy: {accuracy:.2f}")
         precision_label.config(text=f"Precision: {precision:.2f}")
         recall_label.config(text=f"Recall: {recall:.2f}")
         f1_label.config(text=f"F1 Score: {f1:.2f}")
-        auc_label.config(text=f"Area Under ROC: {auc:.2f}")
         mcc_label.config(text=f"Matthews Correlation Coefficient: {mcc:.2f}")
 
         # Clear labels for regression metrics
@@ -172,7 +172,6 @@ def calculate_metrics():
         precision_label.grid_remove()
         recall_label.grid_remove()
         f1_label.grid_remove()
-        auc_label.grid_remove()
         mcc_label.grid_remove()
 
         # Update labels for regression metrics
@@ -198,22 +197,19 @@ evalmetrics_label.grid(column=0, row=6, padx=5, pady=5)
 
 # Labels for displaying classification metrics
 accuracy_label = tk.Label(root, text=f"Accuracy: ")
-accuracy_label.grid(column=0, row=8, padx=5, pady=5)
+accuracy_label.grid(column=1, row=8, padx=5, pady=5)
 
 precision_label = tk.Label(root, text=f"Precision: ")
-precision_label.grid(column=0, row=9, padx=5, pady=5)
+precision_label.grid(column=0, row=8, padx=5, pady=5)
 
 recall_label = tk.Label(root, text=f"Recall: ")
-recall_label.grid(column=0, row=10, padx=5, pady=5)
+recall_label.grid(column=0, row=9, padx=5, pady=5)
 
 f1_label = tk.Label(root, text=f"F1 Score: ")
-f1_label.grid(column=0, row=11, padx=5, pady=5)
-
-auc_label = tk.Label(root, text=f"Area Under ROC: ")
-auc_label.grid(column=1, row=8, padx=5, pady=5)
+f1_label.grid(column=1, row=9, padx=5, pady=5)
 
 mcc_label = tk.Label(root, text=f"Matthews Correlation Coefficient: ")
-mcc_label.grid(column=1, row=10, padx=5, pady=5)
+mcc_label.grid(column=0, row=10, padx=5, pady=5)
 
 # Labels for displaying regression metrics, starts out Invisible
 mae_label = tk.Label(root, text="")
