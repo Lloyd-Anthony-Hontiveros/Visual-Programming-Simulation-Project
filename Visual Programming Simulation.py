@@ -52,16 +52,16 @@ root.resizable(False, False)
     #Dataset Combo Box
 dataset_string = tk.StringVar()
 datasets_combo = ttk.Combobox(root, textvar=dataset_string)
-datasets_combo['values'] = ('Iris', 'Wine', 'Diabetes', 'California Housing')
+datasets_combo['values'] = ('Breast Cancer', 'Wine (WIP)', 'Diabetes', 'California Housing')
 datasets_combo['state'] = 'readonly'
-datasets_combo.set('Iris')
+datasets_combo.set('Breast Cancer')
 
     #Data Model Combo Box
 datamodel_string = tk.StringVar()
 datamodels = ttk.Combobox(root, textvar=datamodel_string)
 datamodels['values'] = ('Naive Bayes', 'SVM', 'Decision Tree', 'Neural Network')
 datamodels['state'] = 'readonly'
-datamodels.set('Logistic Regression')
+datamodels.set('Naive Bayes')
 
     #Grid Config
 root.columnconfigure(2, weight=2)
@@ -76,9 +76,9 @@ datamodel_label.grid(column=0, row=2, sticky=tk.W, padx=5, pady=5)
 datamodels.grid(column=0, row=3, sticky=tk.W, padx=5, pady=5, columnspan=2)
 
 def load_dataset(dataset_name):
-    if dataset_name == 'Iris':
-        return datasets.load_iris(return_X_y=True), 'Classification'
-    elif dataset_name == 'Wine':
+    if dataset_name == 'Breast Cancer':
+        return datasets.load_breast_cancer(return_X_y=True), 'Classification'
+    elif dataset_name == 'Wine (WIP)':
         return datasets.load_wine(return_X_y=True), 'Classification'
     elif dataset_name == 'Diabetes':
         return datasets.load_diabetes(return_X_y=True), 'Regression'
@@ -136,24 +136,29 @@ def calculate_metrics():
         precision = precision_score(y_true, y_pred, average='weighted', zero_division=1)
         recall = recall_score(y_true, y_pred, average='weighted')
         f1 = f1_score(y_true, y_pred, average='weighted')
-        auc = np.round(roc_auc_score(y_true, y_pred, multi_class="ovr", average="weighted"), 3)
-        mcc = matthews_corrcoef(y_true, y_pred, average='weighted')
+        auc = roc_auc_score(y_true, y_pred, multi_class="ovo", average="weighted")
+        mcc = matthews_corrcoef(y_true, y_pred)
 
         # Update labels for classification metrics
+        accuracy_label.grid()
+        precision_label.grid()
+        recall_label.grid()
+        f1_label.grid()
+        auc_label.grid()
+        mcc_label.grid()
         accuracy_label.config(text=f"Accuracy: {accuracy:.2f}")
         precision_label.config(text=f"Precision: {precision:.2f}")
         recall_label.config(text=f"Recall: {recall:.2f}")
         f1_label.config(text=f"F1 Score: {f1:.2f}")
         auc_label.config(text=f"Area Under ROC: {auc:.2f}")
-        mcc_value_label.config(text=f"{mcc:.2f}")
+        mcc_label.config(text=f"Matthews Correlation Coefficient: {mcc:.2f}")
 
         # Clear labels for regression metrics
-        mae_label.config(text="")
-        mse_label.config(text="")
-        rmse_label.config(text="")
-        rmsle_label.config(text="")
-        rmsle_value_label.config(text="")
-        r2_label.config(text="")
+        mae_label.grid_remove()
+        mse_label.grid_remove()
+        rmse_label.grid_remove()
+        mpe_label.grid_remove()
+        r2_label.grid_remove()
 
     elif dataset_type_var == 'Regression':
         mae = mean_absolute_error(y_true, y_pred)
@@ -163,16 +168,19 @@ def calculate_metrics():
         r2 = r2_score(y_true, y_pred)
 
         # Clear labels for classification metrics
-        accuracy_label.config(text="")
-        precision_label.config(text="")
-        recall_label.config(text="")
-        f1_label.config(text="")
-        auc_label.config(text="")
-        auc_val_label.config(text="")
-        mcc_label.config(text="")
-        mcc_value_label.config(text="")
+        accuracy_label.grid_remove()
+        precision_label.grid_remove()
+        recall_label.grid_remove()
+        f1_label.grid_remove()
+        auc_label.grid_remove()
+        mcc_label.grid_remove()
 
         # Update labels for regression metrics
+        mae_label.grid()
+        mse_label.grid()
+        rmse_label.grid()
+        mpe_label.grid()
+        r2_label.grid()
         mae_label.config(text=f"Mean Absolute Error: {mae:.2f}")
         mse_label.config(text=f"Mean Squared Error: {mse:.2f}")
         rmse_label.config(text=f"Root Mean Squared Error: {rmse:.2f}")
@@ -181,63 +189,62 @@ def calculate_metrics():
 
 # Button to calculate metrics
 calculate_button = ttk.Button(root, text="Calculate Metrics", command=calculate_metrics)
-calculate_button.grid(column=0, row=4, sticky=tk.W, padx=5, pady=5)
+calculate_button.grid(column=0, row=4, padx=5, pady=5)
 
-tk.Label(root, text="").grid(column=0, row=5, sticky=tk.W, padx=5, pady=5)
+tk.Label(root, text="").grid(column=0, row=5, padx=5, pady=5)
 
 evalmetrics_label = tk.Label(root, text="Evaluation Metrics")
-evalmetrics_label.grid(column=0, row=6, sticky=tk.W, padx=5, pady=5)
+evalmetrics_label.grid(column=0, row=6, padx=5, pady=5)
 
 # Labels for displaying classification metrics
-accuracy_label = tk.Label(root, text="Accuracy: ")
-accuracy_label.grid(column=0, row=8, sticky=tk.W, padx=5, pady=5)
+accuracy_label = tk.Label(root, text=f"Accuracy: ")
+accuracy_label.grid(column=0, row=8, padx=5, pady=5)
 
-precision_label = tk.Label(root, text="Precision: ")
-precision_label.grid(column=0, row=9, sticky=tk.W, padx=5, pady=5)
+precision_label = tk.Label(root, text=f"Precision: ")
+precision_label.grid(column=0, row=9, padx=5, pady=5)
 
-recall_label = tk.Label(root, text="Recall: ")
-recall_label.grid(column=0, row=10, sticky=tk.W, padx=5, pady=5)
+recall_label = tk.Label(root, text=f"Recall: ")
+recall_label.grid(column=0, row=10, padx=5, pady=5)
 
-f1_label = tk.Label(root, text="F1 Score: ")
-f1_label.grid(column=0, row=11, sticky=tk.W, padx=5, pady=5)
+f1_label = tk.Label(root, text=f"F1 Score: ")
+f1_label.grid(column=0, row=11, padx=5, pady=5)
 
 auc_label = tk.Label(root, text=f"Area Under ROC: ")
-auc_label.grid(column=1, row=8, sticky=tk.W, padx=5, pady=5)
+auc_label.grid(column=1, row=8, padx=5, pady=5)
 
-auc_val_label = tk.Label(root, text="number")
-auc_val_label.grid(column=1, row=9, sticky=tk.W, padx=5, pady=5)
+mcc_label = tk.Label(root, text=f"Matthews Correlation Coefficient: ")
+mcc_label.grid(column=1, row=10, padx=5, pady=5)
 
-mcc_label = tk.Label(root, text="Matthews Correlation Coefficient: ")
-mcc_label.grid(column=1, row=10, sticky=tk.W, padx=5, pady=5)
+# Labels for displaying regression metrics, starts out Invisible
+mae_label = tk.Label(root, text="")
+mae_label.grid(column=0, row=8, padx=5, pady=5)
+mae_label.grid_remove()
 
-mcc_value_label = tk.Label(root, text="number")
-mcc_value_label.grid(column=1, row=11, sticky=tk.W, padx=5, pady=5)
+mse_label = tk.Label(root, text="")
+mse_label.grid(column=0, row=9, padx=5, pady=5)
+mse_label.grid_remove()
 
-# Labels for displaying regression metrics
-mae_label = tk.Label(root, text="Mean Absolute Error: ")
-mae_label.grid(column=0, row=8, sticky=tk.W, padx=5, pady=5)
+rmse_label = tk.Label(root, text="")
+rmse_label.grid(column=0, row=10, padx=5, pady=5)
+rmse_label.grid_remove()
 
-mse_label = tk.Label(root, text="Mean Squared Error: ")
-mse_label.grid(column=0, row=9, sticky=tk.W, padx=5, pady=5)
+mpe_label = tk.Label(root, text="")
+mpe_label.grid(column=0, row=11, padx=5, pady=5)
+mpe_label.grid_remove()
 
-rmse_label = tk.Label(root, text="Root Mean Squared Error: ")
-rmse_label.grid(column=0, row=10, sticky=tk.W, padx=5, pady=5)
+r2_label = tk.Label(root, text="")
+r2_label.grid(column=1, row=8, padx=5, pady=5)
+r2_label.grid_remove()
 
-mpe_label = tk.Label(root, text="Mean Squared Percentage Error: ")
-mpe_label.grid(column=0, row=11, sticky=tk.W, padx=5, pady=5)
-
-r2_label = tk.Label(root, text="R2 Score: ")
-r2_label.grid(column=1, row=8, sticky=tk.W, padx=5, pady=5)
-
-dataset_name_var = "Example Dataset"
+dataset_name_var = "Breast Cancer"
 dataset_name = tk.Label(root, text=f"Dataset Title: {dataset_name_var}")
 dataset_name.grid(column=2, row=1, sticky=tk.W, padx=5, pady=5)
 
-dataset_type_var = "Example Target Type" #Some function to determine Target type here
+dataset_type_var = "Classification" #Some function to determine Target type here
 dataset_type = tk.Label(root, text=f"Dataset Type: {dataset_type_var}")
 dataset_type.grid(column=2, row=2, sticky=tk.W, padx=5, pady=5)
 
-datamodel_name_var = "Example Data Model"
+datamodel_name_var = "Naive Bayes"
 datamodel_name = tk.Label(root, text=f"Data Model Used: {datamodel_name_var}")
 datamodel_name.grid(column=2, row=3, sticky=tk.W, padx=5, pady=5)
 
