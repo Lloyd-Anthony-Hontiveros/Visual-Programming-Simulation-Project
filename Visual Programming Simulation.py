@@ -3,13 +3,16 @@ from tkinter import ttk
 import matplotlib
 import numpy as np
 from sklearn import datasets
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, matthews_corrcoef
+from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error, mean_squared_error, mean_squared_log_error, r2_score
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg,
     NavigationToolbar2Tk
 )
+from sklearn.model_selection import train_test_split
+from sklearn import linear_model, tree
+from sklearn.naive_bayes import GaussianNB
 
 root = tk.Tk()
 root.title("Evaluation Metrics Simulation") #Title of Main Program
@@ -74,15 +77,28 @@ datamodels.grid(column=0, row=3, sticky=tk.W, padx=5, pady=5, columnspan=2)
 
 def load_dataset(dataset_name):
     if dataset_name == 'Iris':
-        return datasets.load_iris(), 'Classification'
+        return datasets.load_iris(return_X_y=True), 'Classification'
     elif dataset_name == 'Wine':
-        return datasets.load_wine(), 'Classification'
+        return datasets.load_wine(return_X_y=True), 'Classification'
     elif dataset_name == 'Diabetes':
-        return datasets.load_diabetes(), 'Regression'
+        return datasets.load_diabetes(return_X_y=True), 'Regression'
     elif dataset_name == 'California Housing':
-        return datasets.fetch_california_housing(), 'Regression'
+        return datasets.fetch_california_housing(return_X_y=True), 'Regression'
     else:
         return None, None
+
+def train_test_model(data_model, dataset):
+    X, y = dataset
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0, test_size=0.20, train_size=0.80)
+    if (data_model == "Logistic Regression"):
+        logmodel = linear_model.LogisticRegression(random_state=0).fit(X_train,y_train)
+        return logmodel.predict(X_test), y_test
+    elif (data_model == "Decision Tree"):
+        treemodel = tree.DecisionTreeRegressor(random_state=0).fit(X_train,y_train)
+        return treemodel.predict(X_test), y_test
+    elif (data_model == "Linear Regression"):
+        linmodel = linear_model.LinearRegression(random_state=0).fit(X_train,y_train)
+        return linmodel.predict(X_test), y_test
 
 def calculate_metrics():
     dataset_name_var = dataset_string.get()
@@ -98,7 +114,7 @@ def calculate_metrics():
     dataset_type.config(text=f"Dataset Type: {dataset_type_var}")
 
     # Sample evaluation metrics
-    y_true = dataset.target
+    y_pred, y_true = train_test_model(datamodel_name_var, dataset)
 
     #TODO: Prediction Codes
 
@@ -107,19 +123,30 @@ def calculate_metrics():
         precision = precision_score(y_true, y_pred, average='weighted', zero_division=1)
         recall = recall_score(y_true, y_pred, average='weighted')
         f1 = f1_score(y_true, y_pred, average='weighted')
+        auc = roc_auc_score(y_true, y_pred, multi_class="ovr")
+        mcc = matthews_corrcoef(y_true, y_pred, average='weighted')
 
         # Update labels for classification metrics
         accuracy_label.config(text=f"Accuracy: {accuracy:.2f}")
         precision_label.config(text=f"Precision: {precision:.2f}")
         recall_label.config(text=f"Recall: {recall:.2f}")
         f1_label.config(text=f"F1 Score: {f1:.2f}")
+        auc_label.config(text=f"Area Under ROC: {auc:.2f}")
+        mcc_value_label.config(text=f"{mcc:.2f}")
 
         # Clear labels for regression metrics
+        mae_label.config(text="")
         mse_label.config(text="")
+        rmse_label.config(text="")
+        rmsle_label.config(text="")
+        rmsle_value_label.config(text="")
         r2_label.config(text="")
 
     elif dataset_type_var == 'Regression':
+        mae = mean_absolute_error(y_true, y_pred)
         mse = mean_squared_error(y_true, y_pred)
+        rmse = mean_squared_error(y_true, y_pred, squared=False)
+        rmsle = mean_squared_log_error(y_true, y_pred, squared=False)
         r2 = r2_score(y_true, y_pred)
 
         # Clear labels for classification metrics
@@ -127,9 +154,16 @@ def calculate_metrics():
         precision_label.config(text="")
         recall_label.config(text="")
         f1_label.config(text="")
+        auc_label.config(text="")
+        mcc_label.config(text="")
+        mcc_value_label.config(text="")
 
         # Update labels for regression metrics
+        mae_label.config(text=f"Mean Absolute Error: {mae:.2f}")
         mse_label.config(text=f"Mean Squared Error: {mse:.2f}")
+        rmse_label.config(text=f"Root Mean Squared Error: {rmse:.2f}")
+        rmsle_label.config(text=f"Root Mean Squared Logarithmic Error: ")
+        rmsle_value_label.config(text=f"{rmsle}")
         r2_label.config(text=f"R2 Score: {r2:.2f}")
 
 # Button to calculate metrics
