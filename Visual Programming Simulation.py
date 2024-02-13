@@ -219,7 +219,7 @@ evalmetrics_label.grid(column=0, row=0, padx=5, pady=5, columnspan=2)
 
 error_msg = "Error: Invalid Data Model for Dataset"
 error_msg_label = tk.Label(root, text="")
-error_msg_label.grid(column=0, row=7, padx=5, pady=5, columnspan=2)
+error_msg_label.grid(column=0, row=8, padx=5, pady=5, columnspan=2, sticky=tk.W)
 
 # Labels for displaying classification metrics
 accuracy_label = tk.Label(frame, text=f"Accuracy: ")
